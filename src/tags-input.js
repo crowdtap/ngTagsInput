@@ -5,7 +5,7 @@
  * @name tagsInput
  * @module ngTagsInput
  *
-
+ * @description
  * Renders an input box with tag editing support.
  *
  * @param {string} ngModel Assignable angular expression to data-bind to.

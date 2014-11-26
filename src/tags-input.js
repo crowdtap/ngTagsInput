@@ -54,7 +54,8 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                    tagText.length >= options.minLength &&
                    tagText.length <= options.maxLength &&
                    options.allowedTagsPattern.test(tagText) &&
-                   !findInObjectArray(self.items, tag, options.displayProperty);
+                   !findInObjectArray(self.items, tag, options.displayProperty) &&
+                   !findInObjectArray(self.mandatoryItems, tag, options.displayProperty);
         };
 
         self.mandatoryItems = options.mandatoryTags;

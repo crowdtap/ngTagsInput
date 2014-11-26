@@ -600,6 +600,14 @@ describe('tags-input directive', function() {
                 expect(getTagText(2)).toBe('Tag1');
                 expect(getTagText(3)).toBe('Tag2');
             });
+
+            it('does not allow duplicated tags', function() {
+                newTag('MandatoryTag1');
+
+                // Assert
+                expect(getTags().length).toBe(4);
+                expect($scope.tags).toEqual([{ text: 'Tag1' }, { text: 'Tag2' }]);
+            });
         });
 
         describe('mandatory tag', function() {

@@ -54,9 +54,11 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                    tagText.length >= options.minLength &&
                    tagText.length <= options.maxLength &&
                    options.allowedTagsPattern.test(tagText) &&
-                   !findInObjectArray(self.items, tag, options.displayProperty);
+                   !findInObjectArray(self.items, tag, options.displayProperty) &&
+                   !findInObjectArray(self.mandatoryItems, tag, options.displayProperty);
         };
 
+        self.mandatoryItems = options.mandatoryTags;
         self.items = [];
 
         self.addText = function(text) {
@@ -129,6 +131,7 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
             tagsInputConfig.load('tagsInput', $scope, $attrs, {
                 type: [String, 'text', validateType],
                 placeholder: [String, 'Add a tag'],
+                mandatoryTags: [Array, []],
                 tabindex: [Number, null],
                 removeTagSymbol: [String, String.fromCharCode(215)],
                 replaceSpacesWithDashes: [Boolean, true],

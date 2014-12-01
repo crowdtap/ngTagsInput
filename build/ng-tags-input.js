@@ -5,7 +5,7 @@
  * Copyright (c) 2013-2014 Michael Benford
  * License: MIT
  *
- * Generated at 2014-11-26 11:03:08 -0500
+ * Generated at 2014-12-01 16:30:27 -0500
  */
 (function() {
 'use strict';
@@ -95,7 +95,7 @@ var tagsInput = angular.module('ngTagsInput', []);
  * @name tagsInput
  * @module ngTagsInput
  *
-
+ * @description
  * Renders an input box with tag editing support.
  *
  * @param {string} ngModel Assignable angular expression to data-bind to.
@@ -162,6 +162,10 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
 
             if (options.replaceSpacesWithDashes) {
                 tagText = tagText.replace(/\s/g, '-');
+            }
+
+            if(options.prefix) {
+                tagText = options.prefix + tagText;
             }
 
             setTagText(tag, tagText);
@@ -235,6 +239,7 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
                 enableEditingLastTag: [Boolean, false],
                 minTags: [Number, 0],
                 maxTags: [Number, MAX_SAFE_INTEGER],
+                prefix: [String, null],
                 displayProperty: [String, 'text'],
                 allowLeftoverText: [Boolean, false],
                 addFromAutocompleteOnly: [Boolean, false]
@@ -861,7 +866,7 @@ tagsInput.provider('tagsInputConfig', function() {
 /* HTML templates */
 tagsInput.run(["$templateCache", function($templateCache) {
     $templateCache.put('ngTagsInput/tags-input.html',
-    "<div class=\"host\" tabindex=\"-1\" ti-transclude-append=\"\"><div class=\"tags\" ng-class=\"{focused: hasFocus}\"><ul class=\"tag-list\"><li class=\"tag-item mandatory\" ng-repeat=\"tag in tagList.mandatoryItems\"><span ng-bind=\"getDisplayText(tag)\"></span></li><li class=\"tag-item\" ng-repeat=\"tag in tagList.items track by track(tag)\" ng-class=\"{ selected: tag == tagList.selected }\"><span ng-bind=\"getDisplayText(tag)\"></span> <a class=\"remove-button\" ng-click=\"tagList.remove($index)\" ng-bind=\"options.removeTagSymbol\"></a></li></ul><input class=\"input\" ng-model=\"newTag.text\" ng-change=\"newTagChange()\" ng-trim=\"false\" ng-class=\"{'invalid-tag': newTag.invalid}\" ti-bind-attrs=\"{type: options.type, placeholder: options.placeholder, tabindex: options.tabindex}\" ti-autosize=\"\"></div></div>"
+    "<div class=\"host\" tabindex=\"-1\" ti-transclude-append=\"\"><div class=\"tags\" ng-class=\"{focused: hasFocus}\"><ul class=\"tag-list\"><li class=\"tag-item mandatory\" ng-repeat=\"tag in tagList.mandatoryItems\"><span ng-bind=\"getDisplayText(tag)\"></span></li><li class=\"tag-item\" ng-repeat=\"tag in tagList.items track by track(tag)\" ng-class=\"{ selected: tag == tagList.selected }\"><span ng-bind=\"getDisplayText(tag)\"></span> <a class=\"remove-button\" ng-click=\"tagList.remove($index)\" ng-bind=\"options.removeTagSymbol\"></a></li></ul><span class=\"tag-prefix\" ng-show=\"options.prefix\">{{ options.prefix }}</span><input class=\"input\" ng-model=\"newTag.text\" ng-change=\"newTagChange()\" ng-trim=\"false\" ng-class=\"{'invalid-tag': newTag.invalid}\" ti-bind-attrs=\"{type: options.type, placeholder: options.placeholder, tabindex: options.tabindex}\" ti-autosize=\"\"></div></div>"
   );
 
   $templateCache.put('ngTagsInput/auto-complete.html',

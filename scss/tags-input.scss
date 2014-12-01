@@ -47,6 +47,10 @@ tags-input {
         @include gradient($tag-color-selected);
       }
 
+      &:last-of-type {
+        margin-right: 7px;
+      }
+
       .remove-button {
         margin: 0 0 0 5px;
         padding: 0;
@@ -63,12 +67,16 @@ tags-input {
       }
     }
 
+    .tag-prefix {
+      float: left;
+      line-height: 30px
+    }
+
     .input {
       border: 0;
       outline: none;
       margin: 2px;
       padding: 0;
-      padding-left: 5px;
       float: left;
       height: $tag-height;
       font: $input-font;

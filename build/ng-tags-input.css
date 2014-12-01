@@ -62,6 +62,9 @@ tags-input .tags .tag-item.selected {
   background: -webkit-linear-gradient(top, #febbbb 0%, #fe9090 45%, #ff5c5c 100%);
   background: linear-gradient(to bottom, #febbbb 0%, #fe9090 45%, #ff5c5c 100%);
 }
+tags-input .tags .tag-item:last-of-type {
+  margin-right: 7px;
+}
 tags-input .tags .tag-item .remove-button {
   margin: 0 0 0 5px;
   padding: 0;
@@ -75,12 +78,15 @@ tags-input .tags .tag-item .remove-button {
 tags-input .tags .tag-item .remove-button:active {
   color: red;
 }
+tags-input .tags .tag-prefix {
+  float: left;
+  line-height: 30px;
+}
 tags-input .tags .input {
   border: 0;
   outline: none;
   margin: 2px;
   padding: 0;
-  padding-left: 5px;
   float: left;
   height: 26px;
   font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;

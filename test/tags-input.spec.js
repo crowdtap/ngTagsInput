@@ -358,6 +358,27 @@ describe('tags-input directive', function() {
         });
     });
 
+    describe('prefix option', function() {
+        it('adds prefix to each tag', function() {
+            // Arrange/Act
+            compile('prefix="#"');
+
+            //Act
+            newTag('foo');
+
+            // Assert
+            expect(getTagText(0)).toBe('#foo');
+        });
+
+        it('initializes the option to null', function() {
+            // Arrange/Act
+            compile();
+
+            // Assert
+            expect(isolateScope.options.prefix).toBeNull();
+        });
+    });
+
     describe('add-on-enter option', function() {
         it('adds a new tag when the enter key is pressed and the option is true', function() {
             // Arrange

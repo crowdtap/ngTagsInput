@@ -74,6 +74,10 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 tagText = tagText.replace(/\s/g, '-');
             }
 
+            if(options.prefix) {
+                tagText = options.prefix + tagText;
+            }
+
             setTagText(tag, tagText);
 
             if (tagIsValid(tag)) {
@@ -145,6 +149,7 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 enableEditingLastTag: [Boolean, false],
                 minTags: [Number, 0],
                 maxTags: [Number, MAX_SAFE_INTEGER],
+                prefix: [String, null],
                 displayProperty: [String, 'text'],
                 allowLeftoverText: [Boolean, false],
                 addFromAutocompleteOnly: [Boolean, false]

@@ -9,6 +9,9 @@
         <a class="remove-button" ng-click="tagList.remove($index)" ng-bind="options.removeTagSymbol"></a>
       </li>
     </ul>
+    <span class='tag-prefix' ng-show="options.prefix">
+      {{ options.prefix }}
+    </span>
     <input class="input"
            ng-model="newTag.text"
            ng-change="newTagChange()"

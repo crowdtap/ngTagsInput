@@ -379,6 +379,41 @@ describe('tags-input directive', function() {
         });
     });
 
+    describe('globalMaxLength option', function() {
+        it('blocks user from typing after character limit is reached', function() {
+            // Arrange
+            compile('global-max-length="10"');
+
+            // Act
+            isolateScope.newTag.text = '1234567890';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+
+        it('takes into account prefixes', function() {
+            // Arrange
+            compile('global-max-length="10" prefix="1234"');
+
+            // Act
+            isolateScope.newTag.text = '567890';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+
+        it('takes into account mandatory tags', function() {
+            // Arrange
+            compile('global-max-length=\'10\' mandatory-tags=\'[{"text":"1234"}]\'');
+
+            // Act
+            isolateScope.newTag.text = '567890';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+    });
+
     describe('add-on-enter option', function() {
         it('adds a new tag when the enter key is pressed and the option is true', function() {
             // Arrange

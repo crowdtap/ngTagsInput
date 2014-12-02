@@ -5,7 +5,7 @@
  * Copyright (c) 2013-2014 Michael Benford
  * License: MIT
  *
- * Generated at 2014-12-01 16:30:27 -0500
+ * Generated at 2014-12-02 16:32:10 -0500
  */
 (function() {
 'use strict';
@@ -201,6 +201,33 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
             return tag;
         };
 
+        self.getAllItems = function() {
+            var allItems = [];
+            if(self.mandatoryItems && self.mandatoryItems.length !== 0) {
+                allItems = allItems.concat(self.mandatoryItems);
+            }
+            if(self.items && self.items.length !== 0) {
+                allItems = allItems.concat(self.items);
+            }
+
+            return allItems;
+        };
+
+        self.getCharacterLength = function() {
+            var allItems = self.getAllItems();
+            if(allItems.length === 0) {
+                return 0;
+            }
+
+            var length = self.getAllItems().map(function(item) {
+                return item.text;
+            }).reduce(function(previousValue, currentValue, index, array) {
+                return (previousValue + currentValue);
+            }).length;
+
+            return length;
+        };
+
         return self;
     }
 
@@ -231,6 +258,7 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
                 replaceSpacesWithDashes: [Boolean, true],
                 minLength: [Number, 3],
                 maxLength: [Number, MAX_SAFE_INTEGER],
+                globalMaxLength: [Number, null],
                 addOnEnter: [Boolean, true],
                 addOnSpace: [Boolean, false],
                 addOnComma: [Boolean, true],
@@ -363,6 +391,16 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
                         shouldAdd, shouldRemove;
 
                     if (isModifier || hotkeys.indexOf(key) === -1) {
+                        if(options.globalMaxLength) {
+                            var inputTextLength = scope.newTag.text.length;
+                            if(options.prefix) {
+                                inputTextLength += options.prefix.length;
+                            }
+                            if(tagList.getCharacterLength() + inputTextLength >= options.globalMaxLength) {
+                                e.preventDefault();
+                            }
+                        }
+
                         return;
                     }
 

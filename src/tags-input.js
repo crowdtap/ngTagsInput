@@ -111,6 +111,33 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
             return tag;
         };
 
+        self.getAllItems = function() {
+            var allItems = [];
+            if(self.mandatoryItems && self.mandatoryItems.length !== 0) {
+                allItems = allItems.concat(self.mandatoryItems);
+            }
+            if(self.items && self.items.length !== 0) {
+                allItems = allItems.concat(self.items);
+            }
+
+            return allItems;
+        };
+
+        self.getCharacterLength = function() {
+            var allItems = self.getAllItems();
+            if(allItems.length === 0) {
+                return 0;
+            }
+
+            var length = self.getAllItems().map(function(item) {
+                return item.text;
+            }).reduce(function(previousValue, currentValue, index, array) {
+                return (previousValue + currentValue);
+            }).length;
+
+            return length;
+        };
+
         return self;
     }
 
@@ -141,6 +168,7 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 replaceSpacesWithDashes: [Boolean, true],
                 minLength: [Number, 3],
                 maxLength: [Number, MAX_SAFE_INTEGER],
+                globalMaxLength: [Number, null],
                 addOnEnter: [Boolean, true],
                 addOnSpace: [Boolean, false],
                 addOnComma: [Boolean, true],
@@ -273,6 +301,16 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                         shouldAdd, shouldRemove;
 
                     if (isModifier || hotkeys.indexOf(key) === -1) {
+                        if(options.globalMaxLength) {
+                            var inputTextLength = scope.newTag.text.length;
+                            if(options.prefix) {
+                                inputTextLength += options.prefix.length;
+                            }
+                            if(tagList.getCharacterLength() + inputTextLength >= options.globalMaxLength) {
+                                e.preventDefault();
+                            }
+                        }
+
                         return;
                     }
 

@@ -111,6 +111,18 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
             return tag;
         };
 
+        self.getAllItems = function() {
+            var allItems = [];
+            if(self.mandatoryItems && self.mandatoryItems.length !== 0) {
+                allItems = allItems.concat(self.mandatoryItems);
+            }
+            if(self.items && self.items.length !== 0) {
+                allItems = allItems.concat(self.items);
+            }
+
+            return allItems;
+        };
+
         return self;
     }
 
@@ -124,7 +136,8 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
         scope: {
             tags: '=ngModel',
             onTagAdded: '&',
-            onTagRemoved: '&'
+            onTagRemoved: '&',
+            onGlobalLengthChanged: '&'
         },
         replace: false,
         transclude: true,
@@ -141,6 +154,7 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 replaceSpacesWithDashes: [Boolean, true],
                 minLength: [Number, 3],
                 maxLength: [Number, MAX_SAFE_INTEGER],
+                globalMaxLength: [Number, null],
                 addOnEnter: [Boolean, true],
                 addOnSpace: [Boolean, false],
                 addOnComma: [Boolean, true],
@@ -204,11 +218,16 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
             events
                 .on('tag-added', scope.onTagAdded)
                 .on('tag-removed', scope.onTagRemoved)
+                .on('global-length-changed', scope.onGlobalLengthChanged)
+                .on('tag-removed', function() {
+                    scope.globalLengthChange();
+                })
                 .on('tag-added', function() {
                     scope.newTag.text = '';
                 })
                 .on('tag-added tag-removed', function() {
                     ngModelCtrl.$setViewValue(scope.tags);
+                    scope.globalLengthChange();
                 })
                 .on('invalid-tag', function() {
                     scope.newTag.invalid = true;
@@ -249,6 +268,22 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 events.trigger('input-change', scope.newTag.text);
             };
 
+            scope.globalLengthChange = function() {
+                events.trigger('global-length-changed', { $length: scope.getGlobalTextLength() });
+            };
+
+            scope.getGlobalTextLength = function() {
+                var tagsText = tagList.getAllItems().map(function(item) { return item.text; });
+
+                var inputText = scope.newTag.text;
+                if(options.prefix) {
+                    inputText = options.prefix + inputText;
+                }
+                tagsText.push(inputText);
+
+                return tagsText.join(' ').length;
+            };
+
             scope.$watch('tags', function(value) {
                 scope.tags = makeObjectArray(value, options.displayProperty);
                 tagList.items = scope.tags;
@@ -273,6 +308,11 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                         shouldAdd, shouldRemove;
 
                     if (isModifier || hotkeys.indexOf(key) === -1) {
+                        if(options.globalMaxLength) {
+                            if(scope.getGlobalTextLength() >= options.globalMaxLength) {
+                                e.preventDefault();
+                            }
+                        }
                         return;
                     }
 
@@ -298,6 +338,9 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                         scope.$apply();
                         e.preventDefault();
                     }
+                })
+                .on('keyup', function() {
+                    scope.globalLengthChange();
                 })
                 .on('focus', function() {
                     if (scope.hasFocus) {

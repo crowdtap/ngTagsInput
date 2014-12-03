@@ -379,6 +379,65 @@ describe('tags-input directive', function() {
         });
     });
 
+    describe('globalMaxLength option', function() {
+        it('blocks user from typing after character limit is reached', function() {
+            // Arrange
+            compile('global-max-length="10"');
+
+            // Act
+            isolateScope.newTag.text = '1234567890';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+
+        it('does not block user if character limit wasnt reached', function() {
+            // Arrange
+            compile('global-max-length="10"');
+
+            // Act
+            isolateScope.newTag.text = '123456789';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(false);
+        });
+
+        it('takes into account prefixes', function() {
+            // Arrange
+            compile('global-max-length="10" prefix="1234"');
+
+            // Act
+            isolateScope.newTag.text = '567890';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+
+        it('takes into account mandatory tags', function() {
+            // Arrange
+            compile('global-max-length=\'10\' mandatory-tags=\'[{"text":"1234"}]\'');
+
+            // Act
+            isolateScope.newTag.text = '567890';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+
+        it('takes into account spaces between tags', function() {
+            // Arrange
+            compile('global-max-length="10" mandatory-tags=\'[{"text":"123"}]\'');
+            newTag('567');
+
+            // Act
+            isolateScope.newTag.text = '90';
+
+            // Assert
+            expect(isolateScope.getGlobalTextLength()).toEqual(10);
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+    });
+
     describe('add-on-enter option', function() {
         it('adds a new tag when the enter key is pressed and the option is true', function() {
             // Arrange

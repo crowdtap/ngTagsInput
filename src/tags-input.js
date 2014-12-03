@@ -123,21 +123,6 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
             return allItems;
         };
 
-        self.getCharacterLength = function() {
-            var allItems = self.getAllItems();
-            if(allItems.length === 0) {
-                return 0;
-            }
-
-            var length = self.getAllItems().map(function(item) {
-                return item.text;
-            }).reduce(function(previousValue, currentValue, index, array) {
-                return (previousValue + currentValue);
-            }).length;
-
-            return length;
-        };
-
         return self;
     }
 
@@ -151,7 +136,8 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
         scope: {
             tags: '=ngModel',
             onTagAdded: '&',
-            onTagRemoved: '&'
+            onTagRemoved: '&',
+            onGlobalLengthChanged: '&'
         },
         replace: false,
         transclude: true,
@@ -232,11 +218,16 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
             events
                 .on('tag-added', scope.onTagAdded)
                 .on('tag-removed', scope.onTagRemoved)
+                .on('global-length-changed', scope.onGlobalLengthChanged)
+                .on('tag-removed', function() {
+                    scope.globalLengthChange();
+                })
                 .on('tag-added', function() {
                     scope.newTag.text = '';
                 })
                 .on('tag-added tag-removed', function() {
                     ngModelCtrl.$setViewValue(scope.tags);
+                    scope.globalLengthChange();
                 })
                 .on('invalid-tag', function() {
                     scope.newTag.invalid = true;
@@ -277,6 +268,22 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 events.trigger('input-change', scope.newTag.text);
             };
 
+            scope.globalLengthChange = function() {
+                events.trigger('global-length-changed', { $length: scope.getGlobalTextLength() });
+            };
+
+            scope.getGlobalTextLength = function() {
+                var tagsText = tagList.getAllItems().map(function(item) { return item.text; });
+
+                var inputText = scope.newTag.text;
+                if(options.prefix) {
+                    inputText = options.prefix + inputText;
+                }
+                tagsText.push(inputText);
+
+                return tagsText.join(' ').length;
+            };
+
             scope.$watch('tags', function(value) {
                 scope.tags = makeObjectArray(value, options.displayProperty);
                 tagList.items = scope.tags;
@@ -302,15 +309,10 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
 
                     if (isModifier || hotkeys.indexOf(key) === -1) {
                         if(options.globalMaxLength) {
-                            var inputTextLength = scope.newTag.text.length;
-                            if(options.prefix) {
-                                inputTextLength += options.prefix.length;
-                            }
-                            if(tagList.getCharacterLength() + inputTextLength >= options.globalMaxLength) {
+                            if(scope.getGlobalTextLength() >= options.globalMaxLength) {
                                 e.preventDefault();
                             }
                         }
-
                         return;
                     }
 
@@ -336,6 +338,9 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                         scope.$apply();
                         e.preventDefault();
                     }
+                })
+                .on('keyup', function() {
+                    scope.globalLengthChange();
                 })
                 .on('focus', function() {
                     if (scope.hasFocus) {

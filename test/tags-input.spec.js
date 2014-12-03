@@ -391,6 +391,17 @@ describe('tags-input directive', function() {
             expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
         });
 
+        it('does not block user if character limit wasnt reached', function() {
+            // Arrange
+            compile('global-max-length="10"');
+
+            // Act
+            isolateScope.newTag.text = '123456789';
+
+            // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(false);
+        });
+
         it('takes into account prefixes', function() {
             // Arrange
             compile('global-max-length="10" prefix="1234"');
@@ -410,6 +421,19 @@ describe('tags-input directive', function() {
             isolateScope.newTag.text = '567890';
 
             // Assert
+            expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
+        });
+
+        it('takes into account spaces between tags', function() {
+            // Arrange
+            compile('global-max-length="10" mandatory-tags=\'[{"text":"123"}]\'');
+            newTag('567');
+
+            // Act
+            isolateScope.newTag.text = '90';
+
+            // Assert
+            expect(isolateScope.getGlobalTextLength()).toEqual(10);
             expect(sendKeyDown('a').isDefaultPrevented()).toBe(true);
         });
     });

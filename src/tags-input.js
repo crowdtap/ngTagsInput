@@ -135,6 +135,7 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
         require: 'ngModel',
         scope: {
             tags: '=ngModel',
+            length: '&',
             onTagAdded: '&',
             onTagRemoved: '&',
             onGlobalLengthChanged: '&'
@@ -293,6 +294,10 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                 setElementValidity();
             });
 
+            scope.$watch('newTag.text', function() {
+                scope.globalLengthChange();
+            });
+
             input
                 .on('keydown', function(e) {
                     // This hack is needed because jqLite doesn't implement stopImmediatePropagation properly.
@@ -338,9 +343,6 @@ tagsInput.directive('tagsInput', function($timeout, $document, tagsInputConfig) 
                         scope.$apply();
                         e.preventDefault();
                     }
-                })
-                .on('keyup', function() {
-                    scope.globalLengthChange();
                 })
                 .on('focus', function() {
                     if (scope.hasFocus) {

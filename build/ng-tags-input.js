@@ -5,7 +5,7 @@
  * Copyright (c) 2013-2014 Michael Benford
  * License: MIT
  *
- * Generated at 2014-12-03 13:58:30 -0500
+ * Generated at 2014-12-04 09:44:50 -0500
  */
 (function() {
 'use strict';
@@ -225,6 +225,7 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
         require: 'ngModel',
         scope: {
             tags: '=ngModel',
+            length: '&',
             onTagAdded: '&',
             onTagRemoved: '&',
             onGlobalLengthChanged: '&'
@@ -383,6 +384,10 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
                 setElementValidity();
             });
 
+            scope.$watch('newTag.text', function() {
+                scope.globalLengthChange();
+            });
+
             input
                 .on('keydown', function(e) {
                     // This hack is needed because jqLite doesn't implement stopImmediatePropagation properly.
@@ -428,9 +433,6 @@ tagsInput.directive('tagsInput', ["$timeout","$document","tagsInputConfig", func
                         scope.$apply();
                         e.preventDefault();
                     }
-                })
-                .on('keyup', function() {
-                    scope.globalLengthChange();
                 })
                 .on('focus', function() {
                     if (scope.hasFocus) {
